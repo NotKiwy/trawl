@@ -2,7 +2,7 @@
 name = "trawl"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.85.0"
+rust-version = "1.86.0"
 description = "CLI tool for downloading media from YouTube, SoundCloud, and more"
 license = "MIT"
 repository = "https://github.com/NotKiwy/trawl"
