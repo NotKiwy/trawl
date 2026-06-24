@@ -18,7 +18,10 @@ impl fmt::Display for TrawlError {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             TrawlError::YtDlpNotFound => {
-                write!(_f, "yt-dlp not found — install it: https://github.com/yt-dlp/yt-dlp")
+                write!(
+                    _f,
+                    "yt-dlp not found — install it: https://github.com/yt-dlp/yt-dlp"
+                )
             }
             TrawlError::YtDlpFailed(_code) => {
                 write!(_f, "yt-dlp exited with code {}", _code)
@@ -27,7 +30,10 @@ impl fmt::Display for TrawlError {
                 write!(_f, "failed to download yt-dlp: {}", _reason)
             }
             TrawlError::SpotifyUnsupported => {
-                write!(_f, "set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to enable Spotify support")
+                write!(
+                    _f,
+                    "set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to enable Spotify support"
+                )
             }
             TrawlError::SpotifyCredentialsMissing => {
                 write!(

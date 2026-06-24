@@ -2,14 +2,16 @@ use trawl::spotify::__parse_url;
 
 #[test]
 fn __test_parse_track_url() {
-    let (_kind, _id) = __parse_url("https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh").unwrap();
+    let (_kind, _id) =
+        __parse_url("https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh").unwrap();
     assert_eq!(_kind, "track");
     assert_eq!(_id, "4iV5W9uYEdYUVa79Axb7Rh");
 }
 
 #[test]
 fn __test_parse_album_url() {
-    let (_kind, _id) = __parse_url("https://open.spotify.com/album/1DFixLWuPkv3KT3TnV35m3").unwrap();
+    let (_kind, _id) =
+        __parse_url("https://open.spotify.com/album/1DFixLWuPkv3KT3TnV35m3").unwrap();
     assert_eq!(_kind, "album");
     assert_eq!(_id, "1DFixLWuPkv3KT3TnV35m3");
 }

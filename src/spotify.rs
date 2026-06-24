@@ -22,8 +22,8 @@ pub fn __parse_url(_url: &str) -> Result<(&str, &str), TrawlError> {
     }
 
     let _path = _host_and_path
-        .splitn(2, '/')
-        .nth(1)
+        .split_once('/')
+        .map(|x| x.1)
         .ok_or_else(|| TrawlError::SpotifyInvalidUrl(_url.to_string()))?;
 
     let _parts: Vec<&str> = _path.splitn(2, '/').collect();
@@ -117,8 +117,8 @@ async fn __resolve_with_api(
     _kind: &str,
     _id: &str,
 ) -> Result<SpotifyResource, TrawlError> {
-    let _client_id = std::env::var("SPOTIFY_CLIENT_ID")
-        .map_err(|_| TrawlError::SpotifyCredentialsMissing)?;
+    let _client_id =
+        std::env::var("SPOTIFY_CLIENT_ID").map_err(|_| TrawlError::SpotifyCredentialsMissing)?;
     let _client_secret = std::env::var("SPOTIFY_CLIENT_SECRET")
         .map_err(|_| TrawlError::SpotifyCredentialsMissing)?;
 
@@ -137,7 +137,10 @@ async fn __resolve_with_api(
                     format!("ytsearch1:{} - {}", _artist, _t.name)
                 })
                 .collect();
-            Ok(SpotifyResource::Multi { name: _album.name, queries: _queries })
+            Ok(SpotifyResource::Multi {
+                name: _album.name,
+                queries: _queries,
+            })
         }
         "playlist" => {
             let _playlist = __fetch_playlist(&_client, &_token, _id).await?;
@@ -151,7 +154,10 @@ async fn __resolve_with_api(
                     format!("ytsearch1:{} - {}", _artist, _t.name)
                 })
                 .collect();
-            Ok(SpotifyResource::Multi { name: _playlist.name, queries: _queries })
+            Ok(SpotifyResource::Multi {
+                name: _playlist.name,
+                queries: _queries,
+            })
         }
         _ => Err(TrawlError::SpotifyInvalidUrl(_url.to_string())),
     }
@@ -224,7 +230,11 @@ async fn __get_token(_client: &Client, _id: &str, _secret: &str) -> Result<Strin
     Ok(_resp.json::<TokenResponse>().await?.access_token)
 }
 
-async fn __fetch_album(_client: &Client, _token: &str, _id: &str) -> Result<SpotifyAlbum, TrawlError> {
+async fn __fetch_album(
+    _client: &Client,
+    _token: &str,
+    _id: &str,
+) -> Result<SpotifyAlbum, TrawlError> {
     let _resp = _client
         .get(format!("https://api.spotify.com/v1/albums/{}", _id))
         .bearer_auth(_token)

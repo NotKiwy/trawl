@@ -45,7 +45,7 @@ jobs:
             bin: trawl.exe
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -87,7 +87,7 @@ jobs:
           $hash = (Get-FileHash "${{ matrix.artifact }}" -Algorithm SHA256).Hash.ToLower()
           "$hash  ${{ matrix.artifact }}" | Tee-Object "${{ matrix.artifact }}.sha256"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: |
@@ -101,9 +101,9 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: trawl-windows-x86_64.exe
           path: installer
@@ -132,7 +132,7 @@ jobs:
           $hash = (Get-FileHash "dist\trawl-windows-x86_64-setup.exe" -Algorithm SHA256).Hash.ToLower()
           "$hash  trawl-windows-x86_64-setup.exe" | Tee-Object "dist\trawl-windows-x86_64-setup.exe.sha256"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: trawl-windows-x86_64-setup.exe
           path: |

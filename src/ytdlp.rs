@@ -22,7 +22,9 @@ pub async fn __ensure() -> Result<PathBuf, TrawlError> {
     __flush_stdout();
 
     let mut _input = String::new();
-    std::io::stdin().read_line(&mut _input).map_err(TrawlError::IoError)?;
+    std::io::stdin()
+        .read_line(&mut _input)
+        .map_err(TrawlError::IoError)?;
 
     if _input.trim().to_lowercase() != "y" {
         return Err(TrawlError::YtDlpNotFound);
@@ -70,23 +72,21 @@ fn __trawl_dir() -> PathBuf {
 }
 
 fn __binary_name() -> &'static str {
-    if cfg!(windows) { "yt-dlp.exe" } else { "yt-dlp" }
+    if cfg!(windows) {
+        "yt-dlp.exe"
+    } else {
+        "yt-dlp"
+    }
 }
 
 fn __release_url() -> &'static str {
     match (std::env::consts::OS, std::env::consts::ARCH) {
-        ("macos", _) => {
-            "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos"
-        }
+        ("macos", _) => "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos",
         ("linux", "aarch64") => {
             "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux_aarch64"
         }
-        ("linux", _) => {
-            "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux"
-        }
-        ("windows", _) => {
-            "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"
-        }
+        ("linux", _) => "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux",
+        ("windows", _) => "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe",
         _ => "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp",
     }
 }
@@ -98,14 +98,9 @@ async fn __download(_dest: &Path) -> Result<(), TrawlError> {
 
     output::__action(&format!("downloading yt-dlp → {}", _dest.display()));
 
-    let _client = Client::builder()
-        .user_agent("trawl")
-        .build()?;
+    let _client = Client::builder().user_agent("trawl").build()?;
 
-    let _response = _client
-        .get(__release_url())
-        .send()
-        .await?;
+    let _response = _client.get(__release_url()).send().await?;
 
     if !_response.status().is_success() {
         return Err(TrawlError::YtDlpDownloadFailed(format!(

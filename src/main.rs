@@ -69,10 +69,7 @@ async fn main() {
     }
 }
 
-async fn __handle_spotify(
-    _args: &Args,
-    _ytdlp_path: &std::path::Path,
-) {
+async fn __handle_spotify(_args: &Args, _ytdlp_path: &std::path::Path) {
     if !_args.quiet {
         output::__action("resolving Spotify metadata...");
     }
@@ -88,7 +85,10 @@ async fn __handle_spotify(
     match _resource {
         spotify::SpotifyResource::Track { query: _query } => {
             if !_args.quiet {
-                output::__info(&format!("search {}", _query.trim_start_matches("ytsearch1:")));
+                output::__info(&format!(
+                    "search {}",
+                    _query.trim_start_matches("ytsearch1:")
+                ));
             }
             if _args.dry_run {
                 output::__cmd(&format!("{} {}", _ytdlp_path.display(), _query));
@@ -107,7 +107,10 @@ async fn __handle_spotify(
                 }
             }
         }
-        spotify::SpotifyResource::Multi { name: _name, queries: _queries } => {
+        spotify::SpotifyResource::Multi {
+            name: _name,
+            queries: _queries,
+        } => {
             if !_args.quiet {
                 output::__info(&format!("collection {} ({} tracks)", _name, _queries.len()));
             }

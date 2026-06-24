@@ -21,7 +21,10 @@ fn __styles() -> Styles {
     help_template = "{about}\n\n{usage-heading} {usage}\n\n{all-args}",
 )]
 pub struct Args {
-    #[arg(value_name = "URL", help = "YouTube, SoundCloud, Spotify, or any yt-dlp supported URL")]
+    #[arg(
+        value_name = "URL",
+        help = "YouTube, SoundCloud, Spotify, or any yt-dlp supported URL"
+    )]
     pub url: String,
 
     #[arg(
@@ -86,7 +89,12 @@ pub struct Args {
     )]
     pub audio_quality: String,
 
-    #[arg(short = 'N', long, help = "Single item only, skip playlist", help_heading = "Playlist")]
+    #[arg(
+        short = 'N',
+        long,
+        help = "Single item only, skip playlist",
+        help_heading = "Playlist"
+    )]
     pub no_playlist: bool,
 
     #[arg(
@@ -116,7 +124,12 @@ pub struct Args {
     )]
     pub playlist_items: Option<String>,
 
-    #[arg(short = 'S', long, help = "Download subtitles", help_heading = "Metadata")]
+    #[arg(
+        short = 'S',
+        long,
+        help = "Download subtitles",
+        help_heading = "Metadata"
+    )]
     pub subs: bool,
 
     #[arg(

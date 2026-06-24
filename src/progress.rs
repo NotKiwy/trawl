@@ -88,7 +88,11 @@ fn __parse_percent(_line: &str) -> Option<u64> {
         return None;
     }
     let _pct_token = _line.split_whitespace().find(|_s| _s.ends_with('%'))?;
-    _pct_token.trim_end_matches('%').parse::<f64>().ok().map(|_p| _p.clamp(0.0, 100.0) as u64)
+    _pct_token
+        .trim_end_matches('%')
+        .parse::<f64>()
+        .ok()
+        .map(|_p| _p.clamp(0.0, 100.0) as u64)
 }
 
 fn __is_stderr_status(_line: &str) -> bool {
