@@ -1,0 +1,16 @@
+/target
+/dist
+.DS_Store
+*.pdb
+*.mp4
+*.mp3
+*.opus
+*.m4a
+*.webm
+*.mkv
+*.flac
+*.wav
+coverage/
+.claude/
+.dev/
+

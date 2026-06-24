@@ -1,0 +1,8 @@
+pub mod args;
+pub mod downloader;
+pub mod error;
+pub mod output;
+pub mod platform;
+pub mod progress;
+pub mod spotify;
+pub mod ytdlp;
