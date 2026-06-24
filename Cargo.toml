@@ -1,0 +1,36 @@
+[package]
+name = "trawl"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75.0"
+description = "CLI tool for downloading media from YouTube, SoundCloud, and more"
+license = "MIT"
+repository = "https://github.com/NotKiwy/trawl"
+keywords = ["youtube", "download", "media", "cli", "yt-dlp"]
+categories = ["command-line-utilities", "multimedia"]
+
+[[bin]]
+name = "trawl"
+path = "src/main.rs"
+
+[lib]
+name = "trawl"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+colored = "2"
+indicatif = "0.17"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

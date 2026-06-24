@@ -1,0 +1,141 @@
+name: Build
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    name: ${{ matrix.artifact }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            artifact: trawl-linux-x86_64
+            bin: trawl
+
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            artifact: trawl-linux-aarch64
+            bin: trawl
+            cross: true
+
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            artifact: trawl-macos-x86_64
+            bin: trawl
+
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            artifact: trawl-macos-aarch64
+            bin: trawl
+
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            artifact: trawl-windows-x86_64.exe
+            bin: trawl.exe
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Install cross
+        if: matrix.cross
+        run: cargo install cross --locked
+
+      - name: Build (native)
+        if: '!matrix.cross'
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Build (cross)
+        if: matrix.cross
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Stage artifact (Unix)
+        if: runner.os != 'Windows'
+        run: cp target/${{ matrix.target }}/release/${{ matrix.bin }} ${{ matrix.artifact }}
+
+      - name: Stage artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Copy-Item "target\${{ matrix.target }}\release\${{ matrix.bin }}" "${{ matrix.artifact }}"
+
+      - name: Checksum (Unix)
+        if: runner.os != 'Windows'
+        run: shasum -a 256 ${{ matrix.artifact }} | tee ${{ matrix.artifact }}.sha256
+
+      - name: Checksum (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash "${{ matrix.artifact }}" -Algorithm SHA256).Hash.ToLower()
+          "$hash  ${{ matrix.artifact }}" | Tee-Object "${{ matrix.artifact }}.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            ${{ matrix.artifact }}
+            ${{ matrix.artifact }}.sha256
+          retention-days: 7
+
+  installer-windows:
+    name: trawl-windows-x86_64-setup.exe
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: trawl-windows-x86_64.exe
+          path: installer
+
+      - name: Rename binary for Inno Setup
+        shell: pwsh
+        run: Rename-Item "installer\trawl-windows-x86_64.exe" "trawl.exe"
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+
+      - name: Create dist directory
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force -Path dist
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\windows.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash "dist\trawl-windows-x86_64-setup.exe" -Algorithm SHA256).Hash.ToLower()
+          "$hash  trawl-windows-x86_64-setup.exe" | Tee-Object "dist\trawl-windows-x86_64-setup.exe.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: trawl-windows-x86_64-setup.exe
+          path: |
+            dist/trawl-windows-x86_64-setup.exe
+            dist/trawl-windows-x86_64-setup.exe.sha256
+          retention-days: 7
