@@ -10,6 +10,7 @@ pub enum TrawlError {
     SpotifyApiError(String),
     SpotifyInvalidUrl(String),
     SpotifyParseError(String),
+    SearchNoResults(String),
     IoError(std::io::Error),
     HttpError(reqwest::Error),
 }
@@ -49,6 +50,9 @@ impl fmt::Display for TrawlError {
             }
             TrawlError::SpotifyParseError(_msg) => {
                 write!(_f, "failed to read Spotify page: {}", _msg)
+            }
+            TrawlError::SearchNoResults(_query) => {
+                write!(_f, "no results found for \"{}\"", _query)
             }
             TrawlError::IoError(_e) => {
                 write!(_f, "IO error: {}", _e)

@@ -2,7 +2,40 @@ use trawl::{args::Args, downloader::__build_args};
 
 fn __base(_url: &str) -> Args {
     Args {
-        url: _url.to_string(),
+        url: Some(_url.to_string()),
+        search: None,
+        audio_only: false,
+        output: ".".to_string(),
+        filename: None,
+        video_quality: "best".to_string(),
+        video_format: "mp4".to_string(),
+        audio_format: "opus".to_string(),
+        audio_quality: "best".to_string(),
+        no_playlist: false,
+        playlist_start: None,
+        playlist_end: None,
+        playlist_items: None,
+        subs: false,
+        subs_lang: "en".to_string(),
+        embed_subs: false,
+        embed_thumbnail: false,
+        embed_metadata: false,
+        concurrent: None,
+        retries: 3,
+        cookies: None,
+        proxy: None,
+        list_formats: false,
+        dry_run: false,
+        quiet: false,
+        log: false,
+        verbose: false,
+    }
+}
+
+fn __search(_query: &str) -> Args {
+    Args {
+        url: None,
+        search: Some(_query.to_string()),
         audio_only: false,
         output: ".".to_string(),
         filename: None,
@@ -217,5 +250,66 @@ fn __test_no_progress_flags_in_verbose_mode() {
     let mut _args = __base("https://youtube.com/watch?v=x");
     _args.verbose = true;
     let _cmd = __build_args(&_args);
+    assert!(!_cmd.contains(&"--newline".to_string()));
+}
+
+#[test]
+fn __test_search_produces_ytsearch_url() {
+    let _args = __search("lofi hip hop radio");
+    let _url = format!("ytsearch1:{}", _args.search.as_deref().unwrap_or_default());
+    assert_eq!(_url, "ytsearch1:lofi hip hop radio");
+}
+
+#[test]
+fn __test_search_build_args_includes_format() {
+    let _args = __search("lofi hip hop radio");
+    let _cmd = __build_args(&_args);
+    let _idx = _cmd.iter().position(|_s| _s == "-f").unwrap();
+    assert!(_cmd[_idx + 1].contains("bestvideo"));
+}
+
+#[test]
+fn __test_search_audio_only() {
+    let mut _args = __search("lo-fi chill beats");
+    _args.audio_only = true;
+    _args.audio_format = "mp3".to_string();
+    let _cmd = __build_args(&_args);
+    assert!(_cmd.contains(&"-x".to_string()));
+    assert!(_cmd.contains(&"--audio-format".to_string()));
+    assert!(_cmd.contains(&"mp3".to_string()));
+}
+
+#[test]
+fn __test_search_custom_output_dir() {
+    let mut _args = __search("some track");
+    _args.output = "/tmp/music".to_string();
+    let _cmd = __build_args(&_args);
+    let _idx = _cmd.iter().position(|_s| _s == "-o").unwrap();
+    assert!(_cmd[_idx + 1].starts_with("/tmp/music"));
+}
+
+#[test]
+fn __test_search_list_formats() {
+    let mut _args = __search("some track");
+    _args.list_formats = true;
+    let _cmd = __build_args(&_args);
+    assert!(_cmd.contains(&"--list-formats".to_string()));
+}
+
+#[test]
+fn __test_search_quiet_no_progress_flags() {
+    let mut _args = __search("some track");
+    _args.quiet = true;
+    let _cmd = __build_args(&_args);
+    assert!(!_cmd.contains(&"--newline".to_string()));
+    assert!(!_cmd.contains(&"--progress".to_string()));
+}
+
+#[test]
+fn __test_search_verbose() {
+    let mut _args = __search("some track");
+    _args.verbose = true;
+    let _cmd = __build_args(&_args);
+    assert!(_cmd.contains(&"--verbose".to_string()));
     assert!(!_cmd.contains(&"--newline".to_string()));
 }

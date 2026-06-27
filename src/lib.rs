@@ -4,5 +4,6 @@ pub mod error;
 pub mod output;
 pub mod platform;
 pub mod progress;
+pub mod search;
 pub mod spotify;
 pub mod ytdlp;

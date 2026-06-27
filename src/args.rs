@@ -23,9 +23,18 @@ fn __styles() -> Styles {
 pub struct Args {
     #[arg(
         value_name = "URL",
-        help = "YouTube, SoundCloud, Spotify, or any yt-dlp supported URL"
+        help = "YouTube, SoundCloud, Spotify, or any yt-dlp supported URL",
+        required_unless_present = "search"
     )]
-    pub url: String,
+    pub url: Option<String>,
+
+    #[arg(
+        long,
+        value_name = "QUERY",
+        help = "Search YouTube by name and download the top result",
+        conflicts_with = "url"
+    )]
+    pub search: Option<String>,
 
     #[arg(
         short = 'o',
