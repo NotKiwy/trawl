@@ -112,12 +112,7 @@ async fn __handle_search(_args: &Args, _ytdlp_path: &std::path::Path, _query: &s
         let _url = format!("https://www.youtube.com/watch?v={}", _result.id);
 
         if _total > 1 && !_args.quiet {
-            output::__action(&format!(
-                "[{}/{}] {}",
-                _pos + 1,
-                _total,
-                _result.title
-            ));
+            output::__action(&format!("[{}/{}] {}", _pos + 1, _total, _result.title));
         }
 
         if _args.dry_run {
